@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <canvas id="life" width="1000" height="1000"></canvas>
+    <script>
+      m = document.getElementById("life").getContext("2d");
+
+      const draw = (x, y, c, s) => {
+        m.fillStyle = c;
+        m.fillRect(x, y, s, s);
+      };
+
+      particles = [];
+      const particle = (x, y, c) => {
+        return { x: x, y: y, vx: 0, vy: 0, colour: c };
+      };
+
+      const random = () => {
+        return Math.random() * 900 + 50;
+      };
+
+      const create = (number, colour) => {
+        group = [];
+        for (let i = 0; i < number; i++) {
+          group.push(particle(random(), random(), colour));
+          particles.push(group[i]);
+        }
+        return group;
+      };
+
+      const rule = (particles1, particles2, g) => {
+        for (let i = 0; i < particles1.length; i++) {
+          //Initial force values
+          let fx = 0;
+          let fy = 0;
+          for (let j = 0; j < particles2.length; j++) {
+            a = particles1[i];
+            b = particles2[j];
+
+            let dx = a.x - b.x;
+            let dy = a.y - b.y;
+            d = Math.sqrt(dx * dx + dy * dy);
+            if (d > 0 && d < 50) {
+              F = (g * 1) / d;
+              fx += F * dx;
+              fy += F * dy;
+            }
+          }
+          a.vx = (a.vx + fx) * 0.5;
+          a.vy = (a.vy + fy) * 0.5;
+          a.x += a.vx;
+          a.y += a.vy;
+
+          if (a.x <= 0 || a.x >= 1000) {
+            a.vx *= -1;
+          }
+          if (a.y <= 0 || a.y >= 1000) {
+            a.vy *= -1;
+          }
+        }
+      };
+
+      const randomOperator = () => {
+        const RNG = Math.random();
+        if (RNG < 0.5) {
+          return "-";
+        }
+      };
+
+      yellow = create(330, "yellow");
+      red = create(330, "red");
+      green = create(330, "green");
+
+      const update = () => {
+        rule(red, red, (Math.random() - 0.5) * 2);
+        rule(red, yellow, (Math.random() - 0.5) * 2);
+        rule(red, green, (Math.random() - 0.5) * 2);
+        rule(yellow, yellow, (Math.random() - 0.5) * 2);
+        rule(yellow, red, (Math.random() - 0.5) * 2);
+        rule(yellow, green, (Math.random() - 0.5) * 2);
+        rule(green, green, (Math.random() - 0.5) * 2);
+        rule(green, yellow, (Math.random() - 0.5) * 2);
+        rule(green, red, (Math.random() - 0.5) * 2);
+        m.clearRect(0, 0, 1000, 1000);
+        draw(0, 0, "black", 1000);
+        for (let i = 0; i < particles.length; i++) {
+          draw(particles[i].x, particles[i].y, particles[i].colour, 5);
+        }
+        requestAnimationFrame(update);
+      };
+
+      update();
+    </script>
+  </body>
+</html>
