@@ -1,5 +1,4 @@
-import { QuadTree, Box } from "js-quadtree";
-import { Particle } from "./lib/Particles";
+import { QuadTree, Box, Point } from "js-quadtree";
 import { makeRandomMatrix } from "./lib/makeRandomMatrix";
 
 //Canvas Constants
@@ -16,3 +15,16 @@ const FRICTION_HALFLIFE: number = 0.04;
 const FRICTION_FACTOR: number = Math.pow(0.5, DELTA_TIME / FRICTION_HALFLIFE);
 const ATTRACTION_MATRIX: Array<Array<number>> = makeRandomMatrix(COLOUR_COUNT);
 const CANVAS_BOUNDS: Box = new Box(0, 0, canvas.width, canvas.height);
+const particleTree = new QuadTree(CANVAS_BOUNDS);
+
+function populateTree() {
+  for (let i = 0; i < PARTICLE_COUNT; i++) {
+    particleTree.insert(
+      new Point(
+        Math.random() * CANVAS_BOUNDS.w,
+        Math.random() * CANVAS_BOUNDS.h,
+        { vx: 0, vy: 0, colour: Math.floor(Math.random() * COLOUR_COUNT) }
+      )
+    );
+  }
+}
