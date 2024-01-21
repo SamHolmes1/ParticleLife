@@ -1,19 +1,18 @@
-import { Box, QuadTree } from "js-quadtree";
+import { Box, QuadTree, Point, Circle } from "js-quadtree";
 import { makeRandomMatrix } from "./lib/makeRandomMatrix";
 
 //Canvas Constants
 const canvas = <HTMLCanvasElement>document.getElementById("particles");
 const ctx = canvas.getContext("2d");
-const particleTree = new QuadTree(new Box(0, 0, canvas.width, canvas.height));
-console.log(particleTree);
+const particleTree = new QuadTree(new Box(0, 0, 1, 1)); //The bounds of the quadtree must be normalized (0-1)
 //Constants
-const PARTICLE_COUNT: number = 1000;
-const DELTA_TIME: number = 0.02;
+const PARTICLE_COUNT: number = 2000;
+const DELTA_TIME: number = 0.01;
 const FRICTION_HALFLIFE: number = 0.04;
-const rMax: number = 0.1;
+const rMax: number = 0.15;
 const COLOUR_COUNT: number = 10;
 const ATTRACTION_MATRIX: Array<Array<number>> = makeRandomMatrix(COLOUR_COUNT);
-const FORCE_FACTOR: number = 7;
+const FORCE_FACTOR: number = 10;
 const FRICTION_FACTOR: number = Math.pow(0.5, DELTA_TIME / FRICTION_HALFLIFE);
 
 const colours = new Int32Array(PARTICLE_COUNT);
@@ -28,6 +27,13 @@ for (let i = 0; i < PARTICLE_COUNT; i++) {
   positionsY[i] = Math.random();
   velocitiesX[i] = 0;
   velocitiesY[i] = 0;
+  particleTree.insert(
+    new Point(positionsX[i], positionsY[i], {
+      vx: velocitiesX[i],
+      vy: velocitiesY[i],
+      index: i,
+    })
+  );
 }
 
 function force(r: number, a: number) {
@@ -47,13 +53,20 @@ function updateParticles() {
     let totalForceX = 0;
     let totalForceY = 0;
 
-    for (let j = 0; j < PARTICLE_COUNT; j++) {
+    const neighbours = particleTree.query(
+      new Circle(positionsX[i], positionsY[i], rMax)
+    );
+
+    for (let j = 0; j < neighbours.length; j++) {
       if (j === i) continue;
-      const rx = positionsX[j] - positionsX[i];
-      const ry = positionsY[j] - positionsY[i];
+      const rx = positionsX[neighbours[j].data.index] - positionsX[i];
+      const ry = positionsY[neighbours[j].data.index] - positionsY[i];
       const r = Math.hypot(rx, ry);
       if (r > 0 && r < rMax) {
-        const f = force(r / rMax, ATTRACTION_MATRIX[colours[i]][colours[j]]);
+        const f = force(
+          r / rMax,
+          ATTRACTION_MATRIX[colours[i]][colours[neighbours[j].data.index]]
+        );
         totalForceX += (rx / r) * f;
         totalForceY += (ry / r) * f;
       }
@@ -68,12 +81,12 @@ function updateParticles() {
     velocitiesX[i] += totalForceX * DELTA_TIME;
     velocitiesY[i] += totalForceY * DELTA_TIME;
 
-    if (positionsX[i] <= 0.01 || positionsX[i] >= 0.99) {
-      velocitiesX[i] *= -1;
-    }
-    if (positionsY[i] <= 0.01 || positionsY[i] >= 0.99) {
-      velocitiesY[i] *= -1;
-    }
+    // if (positionsX[i] <= 0.01 || positionsX[i] >= 0.99) {
+    //   velocitiesX[i] *= -1;
+    // }
+    // if (positionsY[i] <= 0.01 || positionsY[i] >= 0.99) {
+    //   velocitiesY[i] *= -1;
+    // }
   }
   //update pos
   for (let i = 0; i < PARTICLE_COUNT; i++) {
@@ -88,7 +101,15 @@ function frame() {
   ctx!.fillStyle = "black";
   ctx?.fillRect(0, 0, canvas.width, canvas.height);
 
+  particleTree.clear();
   for (let i = 0; i < PARTICLE_COUNT; i++) {
+    particleTree.insert(
+      new Point(positionsX[i], positionsY[i], {
+        vx: velocitiesX[i],
+        vy: velocitiesY[i],
+        index: i,
+      })
+    );
     ctx?.beginPath();
     let screenX = positionsX[i] * canvas.width;
     let screenY = positionsY[i] * canvas.height;
@@ -97,6 +118,7 @@ function frame() {
     ctx!.fillStyle = `hsl(${360 * (colours[i] / COLOUR_COUNT)}, 100%,50%)`;
     ctx?.fill();
   }
+
   requestAnimationFrame(frame);
 }
 
