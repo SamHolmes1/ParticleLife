@@ -6,13 +6,13 @@ const canvas = <HTMLCanvasElement>document.getElementById("particles");
 const ctx = canvas.getContext("2d");
 const particleTree = new QuadTree(new Box(0, 0, 1, 1)); //The bounds of the quadtree must be normalized (0-1)
 //Constants
-const PARTICLE_COUNT: number = 2000;
-const DELTA_TIME: number = 0.009;
+const PARTICLE_COUNT: number = 2500;
+const DELTA_TIME: number = 0.02;
 const FRICTION_HALFLIFE: number = 0.04;
-const rMax: number = 0.13;
-const COLOUR_COUNT: number = 7;
+const rMax: number = 0.12;
+const COLOUR_COUNT: number = 5;
 const ATTRACTION_MATRIX: Array<Array<number>> = makeRandomMatrix(COLOUR_COUNT);
-const FORCE_FACTOR: number = 10;
+const FORCE_FACTOR: number = 12;
 const FRICTION_FACTOR: number = Math.pow(0.5, DELTA_TIME / FRICTION_HALFLIFE);
 const RMAX_FORCE_FACTOR: number = rMax * FORCE_FACTOR;
 
@@ -60,14 +60,14 @@ function updateParticles() {
 
     //Add boundary conditions for neighbours on opposing sides of the canvas
     //TODO: add better implementation of periodic boundary conditions
-    if (positionsX[i] < 0) {
+    if (positionsX[i] < 0.01) {
       neighbours = [
         ...neighbours,
         ...particleTree.query(
           new Circle((positionsX[i] += 1), positionsY[i], rMax),
         ),
       ];
-    } else if (positionsX[i] > 1) {
+    } else if (positionsX[i] > 0.99) {
       neighbours = [
         ...neighbours,
         ...particleTree.query(
@@ -75,14 +75,14 @@ function updateParticles() {
         ),
       ];
     }
-    if (positionsY[i] < 0) {
+    if (positionsY[i] < 0.01) {
       neighbours = [
         ...neighbours,
         ...particleTree.query(
           new Circle(positionsX[i], (positionsY[i] += 1), rMax),
         ),
       ];
-    } else if (positionsY[i] > 1) {
+    } else if (positionsY[i] > 0.99) {
       neighbours = [
         ...neighbours,
         ...particleTree.query(
@@ -121,10 +121,10 @@ function updateParticles() {
     positionsY[i] += velocitiesY[i] * DELTA_TIME;
 
     //Add boundary conditions
-    if (positionsX[i] < 0) positionsX[i] += 1;
-    else if (positionsX[i] > 1) positionsX[i] -= 1;
-    if (positionsY[i] < 0) positionsY[i] += 1;
-    else if (positionsY[i] > 1) positionsY[i] -= 1;
+    if (positionsX[i] < 0.01) positionsX[i] += 1;
+    else if (positionsX[i] > 0.99) positionsX[i] -= 1;
+    if (positionsY[i] < 0.01) positionsY[i] += 1;
+    else if (positionsY[i] > 0.99) positionsY[i] -= 1;
   }
 }
 
@@ -147,7 +147,7 @@ function frame() {
     let screenX = positionsX[i] * canvas.width;
     let screenY = positionsY[i] * canvas.height;
 
-    ctx?.arc(screenX, screenY, 2, 0, 2 * Math.PI);
+    ctx?.arc(screenX, screenY, 1.5, 0, 2 * Math.PI);
     ctx!.fillStyle = `hsl(${
       (360 * (colours[i] << (8 / COLOUR_COUNT))) & 0xff
     }, 100%,50%)`;
