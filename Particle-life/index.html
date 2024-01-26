@@ -12,10 +12,35 @@
     }
   </style>
   <body>
+    <script>
+      let particleCount = 1500;
+      let colourCount = 7;
+      let rMax = 0.12;
+
+      function setParticleCount(value) {
+        particleCount = value;
+      }
+      function setColourCount(value) {
+        colourCount = value;
+      }
+      function setRMax(value) {
+        rMax = value;
+      }
+      function restartProxy(){
+        restart(colourCount, particleCount, rMax);
+      }
+    </script>
     <form>
-      <label for="Particle Count">Particle Count</label>
-        <input id="Particle Count" type="range" min="0" max="10" oninput="this.nextElementSibling.value = this.value">
-        <output>5</output>
+      <label for="particle-count-input" id="particle-count-label ">Particle Count</label>
+        <input id="particle-count-input" type="range" min="1" max="3000" default="1000" oninput="this.nextElementSibling.value = this.value; setParticleCount(this.value)">
+        <output id="particle-count-preview">1500</output>
+        <label for="colour-count-input" id="colour-count-label ">Colour Count</label>
+        <input id="colour-count-input" type="range" min="1" max="20" default="7" oninput="this.nextElementSibling.value = this.value; setColourCount(this.value)">
+        <output id="colour-count-preview">7</output>
+        <label for="r-max-input" id="r-max-label ">R Max</label>
+        <input id="r-max-input" type="range" min="0.01" max="0.5" step="0.01" default="0.12" oninput="this.nextElementSibling.value = this.value; setRMax(this.value)">
+        <output id="r-max-preview">0.12</output>
+        <input id="restart-button" type="button" onclick="restartProxy();">Restart</input>
     </form>
     <canvas id="particles" width="1900" height="980"></canvas>
   </body>

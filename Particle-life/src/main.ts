@@ -6,12 +6,12 @@ const canvas = <HTMLCanvasElement>document.getElementById("particles");
 const ctx = canvas.getContext("2d");
 const particleTree = new QuadTree(new Box(0, 0, 1, 1)); //The bounds of the quadtree must be normalized (0-1)
 //Constants
-const PARTICLE_COUNT: number = 2500;
+let PARTICLE_COUNT: number = 2500;
 const DELTA_TIME: number = 0.02;
 const FRICTION_HALFLIFE: number = 0.04;
-const rMax: number = 0.12;
-const COLOUR_COUNT: number = 7;
-const ATTRACTION_MATRIX: Array<Array<number>> = makeRandomMatrix(COLOUR_COUNT);
+let rMax: number = 0.12;
+let COLOUR_COUNT: number = 7;
+let ATTRACTION_MATRIX: Array<Array<number>> = makeRandomMatrix(COLOUR_COUNT);
 const FORCE_FACTOR: number = 12;
 const FRICTION_FACTOR: number = Math.pow(0.5, DELTA_TIME / FRICTION_HALFLIFE);
 const RMAX_FORCE_FACTOR: number = rMax * FORCE_FACTOR;
@@ -21,6 +21,18 @@ const positionsX = new Float32Array(PARTICLE_COUNT);
 const positionsY = new Float32Array(PARTICLE_COUNT);
 const velocitiesX = new Float32Array(PARTICLE_COUNT);
 const velocitiesY = new Float32Array(PARTICLE_COUNT);
+
+function restart(
+  userColourCount: number = COLOUR_COUNT,
+  userParticleCount: number = PARTICLE_COUNT,
+  userrMax: number = rMax,
+) {
+  COLOUR_COUNT = userColourCount;
+  PARTICLE_COUNT = userParticleCount;
+  rMax = userrMax;
+  ATTRACTION_MATRIX = makeRandomMatrix(userColourCount);
+  init();
+}
 
 function init() {
   canvas.width = window.innerWidth - 30;
@@ -39,6 +51,7 @@ function init() {
       }),
     );
   }
+  requestAnimationFrame(frame);
 }
 
 function force(r: number, a: number): number {
@@ -160,6 +173,5 @@ function frame() {
 
   requestAnimationFrame(frame);
 }
-
+(window as any).restart = restart;
 init();
-requestAnimationFrame(frame);
