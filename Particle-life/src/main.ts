@@ -7,34 +7,40 @@ const ctx = canvas.getContext("2d");
 const particleTree = new QuadTree(new Box(0, 0, 1, 1)); //The bounds of the quadtree must be normalized (0-1)
 //Constants
 let PARTICLE_COUNT: number = 2500;
-const DELTA_TIME: number = 0.02;
+let DELTA_TIME: number = 0.02;
 const FRICTION_HALFLIFE: number = 0.04;
-let rMax: number = 0.12;
+const rMax: number = 0.12;
 let COLOUR_COUNT: number = 7;
 let ATTRACTION_MATRIX: Array<Array<number>> = makeRandomMatrix(COLOUR_COUNT);
 const FORCE_FACTOR: number = 12;
 const FRICTION_FACTOR: number = Math.pow(0.5, DELTA_TIME / FRICTION_HALFLIFE);
 const RMAX_FORCE_FACTOR: number = rMax * FORCE_FACTOR;
 
-const colours = new Int32Array(PARTICLE_COUNT);
-const positionsX = new Float32Array(PARTICLE_COUNT);
-const positionsY = new Float32Array(PARTICLE_COUNT);
-const velocitiesX = new Float32Array(PARTICLE_COUNT);
-const velocitiesY = new Float32Array(PARTICLE_COUNT);
+let colours = new Int32Array(PARTICLE_COUNT);
+let positionsX = new Float32Array(PARTICLE_COUNT);
+let positionsY = new Float32Array(PARTICLE_COUNT);
+let velocitiesX = new Float32Array(PARTICLE_COUNT);
+let velocitiesY = new Float32Array(PARTICLE_COUNT);
 
 function restart(
   userColourCount: number = COLOUR_COUNT,
   userParticleCount: number = PARTICLE_COUNT,
-  userrMax: number = rMax,
+  timeStep: number = DELTA_TIME,
 ) {
   COLOUR_COUNT = userColourCount;
   PARTICLE_COUNT = userParticleCount;
-  rMax = userrMax;
+  DELTA_TIME = timeStep;
   ATTRACTION_MATRIX = makeRandomMatrix(userColourCount);
+  colours = new Int32Array(userParticleCount);
+  positionsX = new Float32Array(userParticleCount);
+  positionsY = new Float32Array(userParticleCount);
+  velocitiesX = new Float32Array(userParticleCount);
+  velocitiesY = new Float32Array(userParticleCount);
   init();
 }
 
 function init() {
+  console.log(PARTICLE_COUNT);
   canvas.width = window.innerWidth - 30;
   canvas.height = window.innerHeight - 45;
   for (let i = 0; i < PARTICLE_COUNT; i++) {

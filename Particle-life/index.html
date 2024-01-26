@@ -15,19 +15,22 @@
     <script>
       let particleCount = 1500;
       let colourCount = 7;
-      let rMax = 0.12;
+      let timeStep = 0.02;
 
       function setParticleCount(value) {
         particleCount = value;
       }
+
       function setColourCount(value) {
         colourCount = value;
       }
-      function setRMax(value) {
-        rMax = value;
+
+      function setTimeStep(value) {
+        timeStep = value;
       }
+
       function restartProxy(){
-        restart(colourCount, particleCount, rMax);
+        restart(colourCount, particleCount, timeStep);
       }
     </script>
     <form>
@@ -37,9 +40,9 @@
         <label for="colour-count-input" id="colour-count-label ">Colour Count</label>
         <input id="colour-count-input" type="range" min="1" max="20" default="7" oninput="this.nextElementSibling.value = this.value; setColourCount(this.value)">
         <output id="colour-count-preview">7</output>
-        <label for="r-max-input" id="r-max-label ">R Max</label>
-        <input id="r-max-input" type="range" min="0.01" max="0.5" step="0.01" default="0.12" oninput="this.nextElementSibling.value = this.value; setRMax(this.value)">
-        <output id="r-max-preview">0.12</output>
+        <label for="time-step-input" id="r-max-label ">Delta Time</label>
+        <input id="time-step-input" type="range" min="0.001" max="1" default="0.5" oninput="this.nextElementSibling.value = this.value; setTimeStep(this.value)">
+        <output id="r-max-preview">0.02</output>
         <input id="restart-button" type="button" onclick="restartProxy();">Restart</input>
     </form>
     <canvas id="particles" width="1900" height="980"></canvas>
