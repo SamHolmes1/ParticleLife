@@ -10,7 +10,7 @@ const PARTICLE_COUNT: number = 2500;
 const DELTA_TIME: number = 0.02;
 const FRICTION_HALFLIFE: number = 0.04;
 const rMax: number = 0.12;
-const COLOUR_COUNT: number = 5;
+const COLOUR_COUNT: number = 7;
 const ATTRACTION_MATRIX: Array<Array<number>> = makeRandomMatrix(COLOUR_COUNT);
 const FORCE_FACTOR: number = 12;
 const FRICTION_FACTOR: number = Math.pow(0.5, DELTA_TIME / FRICTION_HALFLIFE);
@@ -22,19 +22,23 @@ const positionsY = new Float32Array(PARTICLE_COUNT);
 const velocitiesX = new Float32Array(PARTICLE_COUNT);
 const velocitiesY = new Float32Array(PARTICLE_COUNT);
 
-for (let i = 0; i < PARTICLE_COUNT; i++) {
-  colours[i] = Math.floor(Math.random() * COLOUR_COUNT);
-  positionsX[i] = Math.random();
-  positionsY[i] = Math.random();
-  velocitiesX[i] = 0;
-  velocitiesY[i] = 0;
-  particleTree.insert(
-    new Point(positionsX[i], positionsY[i], {
-      vx: velocitiesX[i],
-      vy: velocitiesY[i],
-      index: i,
-    }),
-  );
+function init() {
+  canvas.width = window.innerWidth - 30;
+  canvas.height = window.innerHeight - 45;
+  for (let i = 0; i < PARTICLE_COUNT; i++) {
+    colours[i] = Math.floor(Math.random() * COLOUR_COUNT);
+    positionsX[i] = Math.random();
+    positionsY[i] = Math.random();
+    velocitiesX[i] = 0;
+    velocitiesY[i] = 0;
+    particleTree.insert(
+      new Point(positionsX[i], positionsY[i], {
+        vx: velocitiesX[i],
+        vy: velocitiesY[i],
+        index: i,
+      }),
+    );
+  }
 }
 
 function force(r: number, a: number): number {
@@ -60,14 +64,14 @@ function updateParticles() {
 
     //Add boundary conditions for neighbours on opposing sides of the canvas
     //TODO: add better implementation of periodic boundary conditions
-    if (positionsX[i] < 0.01) {
+    if (positionsX[i] < 0) {
       neighbours = [
         ...neighbours,
         ...particleTree.query(
           new Circle((positionsX[i] += 1), positionsY[i], rMax),
         ),
       ];
-    } else if (positionsX[i] > 0.99) {
+    } else if (positionsX[i] > 1) {
       neighbours = [
         ...neighbours,
         ...particleTree.query(
@@ -75,14 +79,14 @@ function updateParticles() {
         ),
       ];
     }
-    if (positionsY[i] < 0.01) {
+    if (positionsY[i] < 0) {
       neighbours = [
         ...neighbours,
         ...particleTree.query(
           new Circle(positionsX[i], (positionsY[i] += 1), rMax),
         ),
       ];
-    } else if (positionsY[i] > 0.99) {
+    } else if (positionsY[i] > 1) {
       neighbours = [
         ...neighbours,
         ...particleTree.query(
@@ -121,10 +125,10 @@ function updateParticles() {
     positionsY[i] += velocitiesY[i] * DELTA_TIME;
 
     //Add boundary conditions
-    if (positionsX[i] < 0.01) positionsX[i] += 1;
-    else if (positionsX[i] > 0.99) positionsX[i] -= 1;
-    if (positionsY[i] < 0.01) positionsY[i] += 1;
-    else if (positionsY[i] > 0.99) positionsY[i] -= 1;
+    if (positionsX[i] < 0) positionsX[i] += 1;
+    else if (positionsX[i] > 1) positionsX[i] -= 1;
+    if (positionsY[i] < 0) positionsY[i] += 1;
+    else if (positionsY[i] > 1) positionsY[i] -= 1;
   }
 }
 
@@ -157,4 +161,5 @@ function frame() {
   requestAnimationFrame(frame);
 }
 
+init();
 requestAnimationFrame(frame);

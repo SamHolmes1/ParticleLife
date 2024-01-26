@@ -12,6 +12,11 @@
     }
   </style>
   <body>
+    <form>
+      <label for="Particle Count">Particle Count</label>
+        <input id="Particle Count" type="range" min="0" max="10" oninput="this.nextElementSibling.value = this.value">
+        <output>5</output>
+    </form>
     <canvas id="particles" width="1900" height="980"></canvas>
   </body>
 </html>
