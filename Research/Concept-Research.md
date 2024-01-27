@@ -1,5 +1,3 @@
-# Periodic boundary conditions
-
 # Spatial partitioning
 
 [Sources]\

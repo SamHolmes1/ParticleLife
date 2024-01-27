@@ -6,7 +6,7 @@ const canvas = <HTMLCanvasElement>document.getElementById("particles");
 const ctx = canvas.getContext("2d");
 const particleTree = new QuadTree(new Box(0, 0, 1, 1)); //The bounds of the quadtree must be normalized (0-1)
 //Constants
-const PARTICLE_COUNT: number = 2500;
+const PARTICLE_COUNT: number = 2000;
 const DELTA_TIME: number = 0.02;
 const FRICTION_HALFLIFE: number = 0.04;
 const rMax: number = 0.12;
@@ -147,7 +147,7 @@ function frame() {
     let screenX = positionsX[i] * canvas.width;
     let screenY = positionsY[i] * canvas.height;
 
-    ctx?.arc(screenX, screenY, 1.5, 0, 2 * Math.PI);
+    ctx?.arc(screenX, screenY, 2, 0, 2 * Math.PI);
     ctx!.fillStyle = `hsl(${
       (360 * (colours[i] << (8 / COLOUR_COUNT))) & 0xff
     }, 100%,50%)`;
